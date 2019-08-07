@@ -179,6 +179,7 @@ accuracy = net.test(TestSetX, TestSetY)
 print("Testing accuracy: " + str(accuracy))
 '''
 
+#Cats vs non-cats classifier. Training accuracy: 100%, testing accuracy:76%
 import h5py
 def load_dataset():
     train_dataset = h5py.File('datasets/train_catvnoncat.h5', "r")
@@ -217,4 +218,17 @@ test_set_x = test_set_x_orig.reshape((m_test, num_px * num_px * 3)).T/255.
 
 net = Network(n_x, [50,50,50,50], 2)
 net.train(train_set_x, train_set_y, learning_rate= 0.05, epochs= 2000, batchSize= m_train)
-print("Testing accuracy: " + str(net.test(test_set_x, test_set_y)))
+#print("Testing accuracy: " + str(net.test(test_set_x, test_set_y)))
+
+import matplotlib.pyplot as plt
+for i in range(10):
+    image = train_set_x[:, i]
+    label = net.predict(image)
+    if label == 0:
+        t = "Not a cat"
+    else:
+        t = "Cat"
+
+    plt.imshow(image.reshape(64, 64, 3))
+    plt.title(t)
+    plt.show()

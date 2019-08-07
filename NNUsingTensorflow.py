@@ -66,7 +66,7 @@ class Network(object):
         acc = self.sess.run(accuracy, feed_dict={X:trainSetX, Y:trainSetY})
         print("Finished training. Training accuracy: " + str(acc))
 
-  đ
+
     def test(self, testsetX, testsetY):
         L = self.num_layers
         X = tf.placeholder(dtype= tf.float32, shape = [self.n_x, None])

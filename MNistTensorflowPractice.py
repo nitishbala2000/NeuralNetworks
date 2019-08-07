@@ -6,6 +6,15 @@ mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
 X_train = mnist.train.images.T
 Y_train = mnist.train.labels.T
 
+import matplotlib.pyplot as plt
+
+for i in range(10):
+    image = X_train[:, i].reshape(28,28)
+    label = np.argmax(Y_train[:, i])
+    plt.imshow(image)
+    plt.title(label)
+    plt.show()
+
 X_test = mnist.test.images.T
 Y_test = mnist.test.labels.T
 
