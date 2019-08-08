@@ -108,7 +108,7 @@ class Network(object):
 
             averageCost /= totalBatches
             if epoch % 10 == 9:
-                print("Epoch {} over. Average cost: {}".format(epoch + 1, averageCost))
+                print("Epoch {} over. Average cost: {:.5f}".format(epoch + 1, averageCost))
 
         trainAccuracy = self.test(trainSetX, trainSetY)
         print("Training accuracy: " + str(trainAccuracy))
