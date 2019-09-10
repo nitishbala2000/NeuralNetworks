@@ -1,4 +1,8 @@
 import numpy as np
+from skimage.color import rgb2gray
+from skimage.transform import resize
+from skimage.io import imread
+import os
 
 def sigmoid(z):
     return 1.0 / (1.0 + np.exp(-z))
@@ -129,106 +133,8 @@ class Network(object):
         accuracy = totalCorrect / m
         return accuracy
 
-    def predict(self, v):
+    def classify(self, v):
         v = v.reshape(v.size, 1)
         A, Z = self.forwardPropagation(self.W, self.b, v)
         return np.argmax(A[self.num_layers])
 
-'''
-#MNIST- 96% accuracy reached
-from tensorflow.examples.tutorials.mnist import input_data
-mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
-X_train = mnist.train.images.T
-Y_train = mnist.train.labels.T
-X_test = mnist.test.images.T
-Y_test = mnist.test.labels.T
-net = Network(784, [50,50,50,50] , 10)
-net.train(trainSetX= X_train, trainSetY= Y_train, epochs= 500, learning_rate= 1)
-accuracy = net.test(X_test, Y_test)
-print("Testing accuracy {}".format(accuracy))
-'''
-
-
-'''Belgian traffic signs- 87.5% test set accuracy reached
-from TrafficSigns import load_data
-def getIntoRequiredShape(images, labels):
-    m = len(images)
-    from skimage import transform
-    images28 = [transform.resize(image, (50, 50)) for image in images]
-
-    from skimage.color import rgb2gray
-    images28 = np.array(images28)
-    images28 = rgb2gray(images28)
-
-    X = images28.reshape(m, 2500).T
-    Y = np.zeros((62, m))
-    for i, label in enumerate(labels):
-        Y[label][i] = 1
-
-    return X, Y
-
-images, labels = load_data("BelgiumTSC_Training")
-trainSetX, trainSetY = getIntoRequiredShape(images, labels)
-
-net = Network(2500, [50,50,50,50], 62)
-net.train(trainSetX, trainSetY, batchSize= 75, learning_rate= 0.3, epochs=1000)
-
-images, labels = load_data("BelgiumTSC_Testing/Testing")
-TestSetX, TestSetY = getIntoRequiredShape(images, labels)
-accuracy = net.test(TestSetX, TestSetY)
-print("Testing accuracy: " + str(accuracy))
-'''
-
-#Cats vs non-cats classifier. Training accuracy: 100%, testing accuracy:76%
-import h5py
-def load_dataset():
-    train_dataset = h5py.File('datasets/train_catvnoncat.h5', "r")
-    train_set_x_orig = np.array(train_dataset["train_set_x"][:])  # your train set features
-    train_set_y_orig = np.array(train_dataset["train_set_y"][:])  # your train set labels
-
-    test_dataset = h5py.File('datasets/test_catvnoncat.h5', "r")
-    test_set_x_orig = np.array(test_dataset["test_set_x"][:])  # your test set features
-    test_set_y_orig = np.array(test_dataset["test_set_y"][:])  # your test set labels
-
-    classes = np.array(test_dataset["list_classes"][:])  # the list of classes
-
-    train_set_y_orig = train_set_y_orig.reshape((1, train_set_y_orig.shape[0]))
-    test_set_y_orig = test_set_y_orig.reshape((1, test_set_y_orig.shape[0]))
-
-    return train_set_x_orig, train_set_y_orig, test_set_x_orig, test_set_y_orig, classes
-
-def getIntoRequiredForm(y):
-    output = np.zeros((2, y.size))
-    for i in range(len(y[0])):
-        label = y[0][i]
-        output[label][i] = 1
-
-    return output
-
-train_set_x_orig, train_set_y, test_set_x_orig, test_set_y,_ = load_dataset()
-train_set_y, test_set_y = getIntoRequiredForm(train_set_y), getIntoRequiredForm(test_set_y)
-
-m_train = train_set_x_orig.shape[0]
-m_test = test_set_x_orig.shape[0]
-num_px = train_set_x_orig.shape[1]
-n_x, n_y = num_px * num_px * 3, 1
-train_set_x = train_set_x_orig.reshape((m_train, num_px * num_px * 3)).T/255.
-test_set_x = test_set_x_orig.reshape((m_test, num_px * num_px * 3)).T/255.
-
-
-net = Network(n_x, [50,50,50,50], 2)
-net.train(train_set_x, train_set_y, learning_rate= 0.05, epochs= 2000, batchSize= m_train)
-#print("Testing accuracy: " + str(net.test(test_set_x, test_set_y)))
-
-import matplotlib.pyplot as plt
-for i in range(10):
-    image = train_set_x[:, i]
-    label = net.predict(image)
-    if label == 0:
-        t = "Not a cat"
-    else:
-        t = "Cat"
-
-    plt.imshow(image.reshape(64, 64, 3))
-    plt.title(t)
-    plt.show()

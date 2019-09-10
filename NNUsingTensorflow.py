@@ -96,35 +96,3 @@ class Network(object):
         Z = self.W[L] @ A + self.b[L]
         Z = self.sess.run(Z, feed_dict= {X : v})
         return np.argmax(Z, axis = 0)[0]
-
-
-
-def getIntoRequiredShape(images, labels):
-    m = len(images)
-    from skimage import transform
-    images28 = [transform.resize(image, (50, 50)) for image in images]
-
-    from skimage.color import rgb2gray
-    images28 = np.array(images28)
-    images28 = rgb2gray(images28)
-
-    X = images28.reshape(m, 2500).T
-    Y = np.zeros((62, m))
-    for i, label in enumerate(labels):
-        Y[label][i] = 1
-
-    return X, Y
-
-from TrafficSigns import load_data
-
-images, labels = load_data("BelgiumTSC_Training")
-trainSetX, trainSetY = getIntoRequiredShape(images, labels)
-
-net = Network(2500, [100,100,100,100,100], 62)
-net.train(trainSetX, trainSetY, batchSize= 75, learning_rate= 0.1, epochs=1500)
-
-images, labels = load_data("BelgiumTSC_Testing/Testing")
-TestSetX, TestSetY = getIntoRequiredShape(images, labels)
-accuracy = net.test(TestSetX, TestSetY)
-print("Testing accuracy: " + str(accuracy))
-
